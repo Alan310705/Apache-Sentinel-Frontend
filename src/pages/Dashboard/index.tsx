@@ -34,7 +34,6 @@ export default function Dashboard() {
 
   const chartColor   = isDdosPanic ? '#ff5555' : isDosPanic ? '#ffb86c' : '#00ff41';
   const chartGradId  = isDdosPanic ? 'grad-red'  : isDosPanic ? 'grad-amber' : 'grad-green';
-  const chartOpacity = isPanic ? 0.28 : 0.18;
 
   return (
     <div className="animate-fadeIn space-y-6">
