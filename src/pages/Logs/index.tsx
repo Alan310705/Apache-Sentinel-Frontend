@@ -41,12 +41,13 @@ function matchesStatus(code: number, filter: StatusFilter): boolean {
 }
 
 export default function Logs() {
-  const { data: realLogs, isLoading } = useLogs();
+  const [page, setPage] = useState(1);
+  const { data, isLoading, error } = useLogs(page);
   const [search,       setSearch]       = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [methodFilter, setMethodFilter] = useState<MethodFilter>('all');
 
-  const logs: ApacheLog[] = realLogs || [];
+  const logs: ApacheLog[] = data?.data || [];
 
   const hasFilters = search.trim() !== '' || statusFilter !== 'all' || methodFilter !== 'all';
 
@@ -279,6 +280,38 @@ export default function Logs() {
           <span>auto-refresh 5s</span>
         </div>
       </div>
+
+      {data && data.pagination.totalPages > 1 && (
+        <div className="pagination-controls" style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '1rem',
+          marginTop: '1rem',
+          padding: '0.75rem',
+          background: 'rgba(0,0,0,0.3)',
+          borderRadius: '3px'
+        }}>
+          <button
+            className="btn btn-ghost btn-sm"
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page <= 1}
+          >
+            ← Prev
+          </button>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+            Page {data.pagination.page} of {data.pagination.totalPages}
+            {' '}({data.pagination.total.toLocaleString()} total)
+          </span>
+          <button
+            className="btn btn-ghost btn-sm"
+            onClick={() => setPage(p => Math.min(data.pagination.totalPages, p + 1))}
+            disabled={page >= data.pagination.totalPages}
+          >
+            Next →
+          </button>
+        </div>
+      )}
 
     </div>
   );
