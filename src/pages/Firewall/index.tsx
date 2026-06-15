@@ -17,10 +17,9 @@ function DetectorBadge({ detector }: { detector: string }) {
 }
 
 export default function Firewall() {
-  const { data: realIPs, isLoading } = useBlockedIPs();
+  const [page, setPage] = useState(1);
+  const { data: blockedIPs, isLoading } = useBlockedIPs(page);
   const { unblock, isUnblocking, unblockAll, isUnblockingAll, block, isBlocking } = useFirewallActions();
-
-  const blockedIPs = realIPs || [];
 
   const [ipToBlock,     setIpToBlock]     = useState('');
   const [blockFeedback, setBlockFeedback] = useState<{ type: 'ok' | 'err'; msg: string } | null>(null);
@@ -32,8 +31,9 @@ export default function Firewall() {
   };
 
   const handleRevokeAll = () => {
-    if (blockedIPs.length === 0) return;
-    if (window.confirm(`Revoke ALL ${blockedIPs.length} active block rules? This cannot be undone.`)) {
+    const ipList = blockedIPs?.data ?? [];
+    if (ipList.length === 0) return;
+    if (window.confirm(`Revoke ALL ${ipList.length} active block rules? This cannot be undone.`)) {
       unblockAll(undefined, {
         onSuccess: (data) => setBlockFeedback({ type: 'ok', msg: `Revoked ${data.revoked} block rule(s).` }),
         onError:   ()     => setBlockFeedback({ type: 'err', msg: 'Failed to revoke all. Check backend logs.' }),
@@ -80,15 +80,15 @@ export default function Firewall() {
               quarantine_list
             </span>
             <div className="flex items-center gap-3">
-              <span className={`count-badge ${blockedIPs.length > 0 ? 'count-badge-red' : 'count-badge-green'}`}>
-                {blockedIPs.length} active rule{blockedIPs.length !== 1 ? 's' : ''}
+              <span className={`count-badge ${(blockedIPs?.data ?? []).length > 0 ? 'count-badge-red' : 'count-badge-green'}`}>
+                {(blockedIPs?.data ?? []).length} active rule{(blockedIPs?.data ?? []).length !== 1 ? 's' : ''}
               </span>
               {/* Revoke All */}
               <button
                 id="revoke-all-btn"
                 className="btn btn-danger btn-sm"
                 onClick={handleRevokeAll}
-                disabled={blockedIPs.length === 0 || isUnblockingAll || isUnblocking}
+                disabled={(blockedIPs?.data ?? []).length === 0 || isUnblockingAll || isUnblocking}
                 title="Revoke all active block rules at once"
               >
                 {isUnblockingAll
@@ -118,7 +118,7 @@ export default function Firewall() {
                       syncing with OS firewall...
                     </td>
                   </tr>
-                ) : blockedIPs.length === 0 ? (
+                ) : (blockedIPs?.data ?? []).length === 0 ? (
                   <tr>
                     <td colSpan={5}>
                       <div className="empty-state">
@@ -129,7 +129,7 @@ export default function Firewall() {
                     </td>
                   </tr>
                 ) : (
-                  blockedIPs.map((rule) => (
+                  (blockedIPs?.data ?? []).map((rule) => (
                     <tr key={rule.ip}>
                       <td className="td-ip whitespace-nowrap">{rule.ip}</td>
                       <td>
@@ -170,9 +170,42 @@ export default function Firewall() {
             </table>
           </div>
 
-          <div className="term-panel-footer">
-            <span>{blockedIPs.length} entries · synced from Windows Firewall</span>
-            <span>auto-refresh 10s</span>
+          <div className="term-panel-footer" style={{ flexDirection: 'column', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+              <span>{blockedIPs?.pagination.total.toLocaleString() ?? 0} entries · synced from Windows Firewall</span>
+              <span>auto-refresh 10s</span>
+            </div>
+
+            {blockedIPs && blockedIPs.pagination.totalPages > 1 && (
+              <div className="pagination-controls" style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '1rem',
+                padding: '0.5rem 0 0',
+                borderTop: '1px solid rgba(255,255,255,0.06)',
+                width: '100%'
+              }}>
+                <button
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                >
+                  {'←'} Prev
+                </button>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                  Page {blockedIPs.pagination.page} of {blockedIPs.pagination.totalPages}
+                  {' '}({blockedIPs.pagination.total.toLocaleString()} total)
+                </span>
+                <button
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => setPage(p => Math.min(blockedIPs.pagination.totalPages, p + 1))}
+                  disabled={page >= blockedIPs.pagination.totalPages}
+                >
+                  Next {'→'}
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
