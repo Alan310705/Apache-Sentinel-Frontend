@@ -1,6 +1,6 @@
 import { api } from './client';
 import type { BlockedIP } from '../types/firewall';
-import type { PaginatedResponse, PaginationMeta } from '../types/pagination';
+import type { PaginatedResponse } from '../types/pagination';
 
 const PAGE_LIMIT = 100;
 

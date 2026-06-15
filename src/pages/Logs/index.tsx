@@ -42,7 +42,7 @@ function matchesStatus(code: number, filter: StatusFilter): boolean {
 
 export default function Logs() {
   const [page, setPage] = useState(1);
-  const { data, isLoading, error } = useLogs(page);
+  const { data, isLoading } = useLogs(page);
   const [search,       setSearch]       = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [methodFilter, setMethodFilter] = useState<MethodFilter>('all');

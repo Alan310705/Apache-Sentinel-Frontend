@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getBlockedIPs, PaginatedBlockedIPs, unblockIP, unblockAll, blockIP } from '../api/firewall';
+import { getBlockedIPs, unblockIP, unblockAll, blockIP } from '../api/firewall';
 
 export function useBlockedIPs(page: number = 1) {
     return useQuery({
