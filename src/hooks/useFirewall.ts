@@ -1,13 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getBlockedIPs, unblockIP, unblockAll, blockIP } from '../api/firewall';
-import type { BlockedIP } from '../types/firewall';
+import { getBlockedIPs, PaginatedBlockedIPs, unblockIP, unblockAll, blockIP } from '../api/firewall';
 
-export function useBlockedIPs() {
-  return useQuery<BlockedIP[]>({
-    queryKey: ['firewall-rules'],
-    queryFn: getBlockedIPs,
-    refetchInterval: 10000,
-  });
+export function useBlockedIPs(page: number = 1) {
+    return useQuery({
+        queryKey: ['firewall-rules', page],
+        queryFn: () => getBlockedIPs(page),
+        refetchInterval: 10000,
+    });
 }
 
 export function useFirewallActions() {

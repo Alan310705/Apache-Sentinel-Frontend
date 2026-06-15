@@ -1,16 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
-import { api } from '../api/client';
-import type { ApacheLog } from '../types/logs';
+import { getLogs, PaginatedLogs } from '../api/logs';
 
-const fetchLogs = async (): Promise<ApacheLog[]> => {
-  const { data } = await api.get<ApacheLog[]>('/api/logs');
-  return data;
-};
-
-export function useLogs() {
-  return useQuery<ApacheLog[]>({
-    queryKey: ['logs'],
-    queryFn: fetchLogs,
-    refetchInterval: 5000,
-  });
+export function useLogs(page: number = 1) {
+    return useQuery<PaginatedLogs>({
+        queryKey: ['logs', page],
+        queryFn: () => getLogs(page),
+        refetchInterval: 5000,
+    });
 }
