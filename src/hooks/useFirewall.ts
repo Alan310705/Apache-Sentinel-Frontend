@@ -6,6 +6,7 @@ export function useBlockedIPs(page: number = 1) {
         queryKey: ['firewall-rules', page],
         queryFn: () => getBlockedIPs(page),
         refetchInterval: 5000,
+        refetchIntervalInBackground: true,
     });
 }
 

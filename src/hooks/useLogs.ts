@@ -6,5 +6,6 @@ export function useLogs(page: number = 1) {
         queryKey: ['logs', page],
         queryFn: () => getLogs(page),
         refetchInterval: 5000,
+        refetchIntervalInBackground: true,
     });
 }

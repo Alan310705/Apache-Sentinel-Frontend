@@ -13,6 +13,7 @@ export function useMetrics() {
     queryKey: ['metrics'],
     queryFn: fetchMetrics,
     refetchInterval: 5000, // Automatic polling every 5000ms
+    refetchIntervalInBackground: true, // Poll even when window is not focused
     placeholderData: (previousData) => previousData, // Smooth UI transitions during updates
   });
 }
