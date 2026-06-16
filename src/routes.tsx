@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import DashboardLayout from './components/layouts/DashboardLayout';
 import Dashboard from './pages/Dashboard';
@@ -6,6 +6,12 @@ import Logs from './pages/Logs';
 import Firewall from './pages/Firewall';
 import Settings from './pages/Settings';
 import Login from './pages/Login';
+import { AuthProvider } from './contexts/AuthContext';
+
+// Auth wrapper that provides context AND renders children
+function AuthWrapper({ children }: { children: React.ReactNode }) {
+  return <AuthProvider>{children}</AuthProvider>;
+}
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -26,48 +32,40 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+// Login route - auth not needed, use separate wrapper
+function LoginWrapper() {
+  return (
+    <AuthWrapper>
+      <Login />
+    </AuthWrapper>
+  );
+}
+
+// Protected layout wrapper
+function ProtectedLayout() {
+  return (
+    <AuthWrapper>
+      <ProtectedRoute>
+        <DashboardLayout />
+      </ProtectedRoute>
+    </AuthWrapper>
+  );
+}
+
 export const router = createBrowserRouter([
   {
     path: '/login',
-    element: <Login />,
+    element: <LoginWrapper />,
   },
   {
     path: '/',
-    element: <DashboardLayout />,
+    element: <ProtectedLayout />,
     children: [
       { index: true, element: <Navigate to="/dashboard" replace /> },
-      {
-        path: 'dashboard',
-        element: (
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        )
-      },
-      {
-        path: 'logs',
-        element: (
-          <ProtectedRoute>
-            <Logs />
-          </ProtectedRoute>
-        )
-      },
-      {
-        path: 'firewall',
-        element: (
-          <ProtectedRoute>
-            <Firewall />
-          </ProtectedRoute>
-        )
-      },
-      {
-        path: 'settings',
-        element: (
-          <ProtectedRoute>
-            <Settings />
-          </ProtectedRoute>
-        )
-      },
+      { path: 'dashboard', element: <Dashboard /> },
+      { path: 'logs', element: <Logs /> },
+      { path: 'firewall', element: <Firewall /> },
+      { path: 'settings', element: <Settings /> },
     ],
   },
 ]);
