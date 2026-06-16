@@ -47,11 +47,13 @@ export default function Login() {
 
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: '#333' }}>
+            <label htmlFor="username" style={{ display: 'block', marginBottom: '0.5rem', color: '#333' }}>
               Username
             </label>
             <input
+              id="username"
               type="text"
+              autoComplete="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
@@ -66,11 +68,13 @@ export default function Login() {
           </div>
 
           <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: '#333' }}>
+            <label htmlFor="password" style={{ display: 'block', marginBottom: '0.5rem', color: '#333' }}>
               Password
             </label>
             <input
+              id="password"
               type="password"
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -85,7 +89,7 @@ export default function Login() {
           </div>
 
           {error && (
-            <div style={{
+            <div role="alert" style={{
               color: '#d32f2f',
               marginBottom: '1rem',
               padding: '0.75rem',
